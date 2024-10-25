@@ -1,6 +1,6 @@
-[submodule "dependencies/glfw"]
-	path = dependencies/glfw
-	url = https://github.com/glfw/glfw.git
-[submodule "dependencies/unity"]
-	path = dependencies/unity
+[submodule "dependencies/external/unity"]
+	path = dependencies/external/unity
 	url = https://github.com/ThrowTheSwitch/Unity.git
+[submodule "dependencies/external/glfw"]
+	path = dependencies/external/glfw
+	url = https://github.com/glfw/glfw.git
