@@ -1,2 +1,3 @@
 build/
 .vscode/
+random_tests.c
