@@ -3,6 +3,10 @@
 #include <string.h>
 
 char *load_shaders(FILE *shaders_file) {
+    if (!shaders_file) {
+        return NULL;
+    }
+
     if(fseek(shaders_file, 0L, SEEK_END) != 0) {
         perror("Failed to determine shader source size.");
         return NULL;
