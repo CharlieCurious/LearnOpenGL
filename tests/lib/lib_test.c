@@ -9,7 +9,7 @@ FILE *test_file = NULL;
 const char *test_data = "Some shader code";
 char *load_shaders_result = NULL;
 
-FILE *create_tmp_file(const char *data) {
+FILE *createTmpFile(const char *data) {
     FILE *file = tmpfile();
     assert(file != NULL);
     fwrite(data, sizeof(char), strlen(data), file);
@@ -20,20 +20,20 @@ FILE *create_tmp_file(const char *data) {
 void setUp() {
 }
 
-void should_load_shaders_correctly(void) {
+void shouldLoadShadersCorrectly(void) {
     // Arrange
-    test_file = create_tmp_file(test_data);
+    test_file = createTmpFile(test_data);
     char *expected_result = "Some shader code\n";
 
     // Act
-    load_shaders_result = load_shaders(test_file);
+    load_shaders_result = loadShaders(test_file);
 
     // Assert
     TEST_ASSERT_NOT_NULL(load_shaders_result);
     TEST_ASSERT_EQUAL_STRING(expected_result, load_shaders_result);
 }
 
-void should_not_load_file_too_large(void) {
+void shouldNotLoadFileTooLarge(void) {
     // Arrange
     test_file = tmpfile();
     fseek(test_file, MAX_FILE_SIZE + 1, SEEK_SET);
@@ -41,15 +41,15 @@ void should_not_load_file_too_large(void) {
     rewind(test_file);
 
     // Act
-    load_shaders_result = load_shaders(test_file);
+    load_shaders_result = loadShaders(test_file);
 
     // Assert
     TEST_ASSERT_NULL(load_shaders_result);
 }
 
-void should_return_null_if_shaders_file_is_null(void) {
+void shouldReturnNullIfShadersFileIsNull(void) {
     // Act
-    load_shaders_result = load_shaders(NULL);
+    load_shaders_result = loadShaders(NULL);
 
     // Assert
     TEST_ASSERT_NULL(load_shaders_result);
@@ -68,8 +68,8 @@ void tearDown() {
 
 int main(int argc, char **argv){
     UNITY_BEGIN();
-    RUN_TEST(should_load_shaders_correctly);
-    RUN_TEST(should_not_load_file_too_large);
-    RUN_TEST(should_return_null_if_shaders_file_is_null);
+    RUN_TEST(shouldLoadShadersCorrectly);
+    RUN_TEST(shouldNotLoadFileTooLarge);
+    RUN_TEST(shouldReturnNullIfShadersFileIsNull);
     return UNITY_END();
 }
