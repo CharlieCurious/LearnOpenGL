@@ -1,8 +1,6 @@
-#define GLFW_INCLUDE_NONE
+#include <lib.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
 
 unsigned int compileShader(GLenum shaderType, const char *shaderSource);
 unsigned int createShaderProgram();
