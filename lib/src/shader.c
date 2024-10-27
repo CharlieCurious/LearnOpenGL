@@ -4,6 +4,8 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <shader.h>
+#include <stdlib.h>
+#include <string.h>
 
 typedef unsigned int shaderId;
 
@@ -50,7 +52,45 @@ programId createShaderProgram(
         glDeleteShader(fragmentShader);
 
         return program;
+}
+
+char *loadShaderSource(FILE *shaderSource) {
+    if (!shaderSource) {
+        return NULL;
     }
+
+    if(fseek(shaderSource, 0L, SEEK_END) != 0) {
+        perror("Failed to determine shader source size.");
+        return NULL;
+    }
+    
+    long length = ftell(shaderSource);
+    if (length < 0 || length > MAX_FILE_SIZE) {
+        perror("File size error of file too large.");
+        return NULL;
+    }
+
+    rewind(shaderSource);
+
+    char *content = (char *)malloc(length + 2); // +2 for /n and /0.
+    if (!content) {
+        perror("Memory allocation failed.");
+        return NULL;
+    }
+
+    size_t read_size = fread(content, 1, length, shaderSource);
+
+    // Handle incomplete reads
+    if (read_size != length) {
+        perror("Failed to read the entire file.");
+        free(content);
+        return NULL;
+    }
+
+    memcpy(content + length, "\n\0", 2);
+
+    return content;
+}
 
 void setUniformBool(programId programID, char *name, bool value) {
     glUniform1i(glGetUniformLocation(programID, name), (int)value);

@@ -3,8 +3,10 @@
 #include <math.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <string.h>
 
 void framebufferSizeCallback(GLFWwindow *window, int width, int height);
+void onCreateProgramError(ShaderProgramError, char *);
 void processInput(GLFWwindow *window);
 
 const unsigned int SCR_WIDTH = 800;
@@ -29,7 +31,12 @@ const char *fragmentShaderSource = "#version 330 core\n"
     "}\n\0";
 
 
-int main() {
+int main(int argc, const char **argv) {
+
+    if (argc < 2) {
+        puts("Specify the path to the shaders folder.");
+        exit(EXIT_FAILURE);
+    }
 
     // ------ Setup GLFW and glad ---------
     initializeGLFW();
@@ -41,7 +48,7 @@ int main() {
     loadOpenGLFunctionPointersOrExit();
 
     // ------ Setup Shaders -------------
-    unsigned int shaderProgram = createShaderProgramOrExit(vertexShaderSource, fragmentShaderSource);
+    programId shaderProgram = createShaderProgram(vertexShaderSource, fragmentShaderSource, onCreateProgramError);
 
     // ------ Setup vertex data and buffers and configure vertex attributes ------
     float vertices[] = {
@@ -94,6 +101,24 @@ int main() {
 
 void framebufferSizeCallback(GLFWwindow *window, int width, int height) {
     glViewport(0, 0, width, height);
+}
+
+void onCreateProgramError(ShaderProgramError errorType, char *message) {
+    switch (errorType)
+    {
+    case SHADER_COMPILATION:
+        fprintf(stderr, "One or more shaders failed to compile: %s\n.", message);
+        glfwTerminate();
+        exit(EXIT_FAILURE);
+    case PROGRAM_LINKING:
+        fprintf(stderr, "Shader program linking failed: %s\n.", message);
+        glfwTerminate();
+        exit(EXIT_FAILURE);
+    default:
+        fprintf(stderr, "Unexpected error while creating shader program occurred: %s\n.", message);
+        glfwTerminate();
+        exit(EXIT_FAILURE);
+    }
 }
 
 void processInput(GLFWwindow *window) {
