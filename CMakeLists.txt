@@ -5,7 +5,7 @@ project(LearnOpenGL)
 set(CMAKE_C_STANDARD 17)
 set(ENABLE_TESTING "Compile tests." ON)
 
-if(ENABLE_TESTING)
+if(ENABLE_TESTING AND "${ENABLE_TESTING}" STREQUAL "ON")
     set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -g -O0")
     set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Build type (Debug, Release)" FORCE)
     add_subdirectory(dependencies/external/unity)
