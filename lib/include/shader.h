@@ -17,6 +17,7 @@ programId createShaderProgram(
     const char *vertexShaderSource, 
     const char *fragmentShaderSource, 
     void (*onErrorCallback)(ShaderProgramError errorType, char *message));
+char *getShaderSourcePath(const char *shaderFolderPath, const char* shaderFileName);
 char *loadShaderSource(FILE *shaderSource);
 void setUniformBool(programId programID, char *name, bool value);
 void setUniformInt(programId programID, char *name, int value);

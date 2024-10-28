@@ -3,17 +3,26 @@ cmake_minimum_required(VERSION 3.22.1)
 project(LearnOpenGL)
 
 set(CMAKE_C_STANDARD 17)
-set(ENABLE_TESTING "Compile tests." ON)
 
-if(ENABLE_TESTING AND "${ENABLE_TESTING}" STREQUAL "ON")
-    set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -g -O0")
+if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Build type (Debug, Release)" FORCE)
+endif()
+
+# Apply compiler flags based on build type
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0")
+elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
+endif()
+
+if(NOT ENABLE_TESTING)
+    set(ENABLE_TESTING "OFF" CACHE STRING "Compile tests" FORCE)
+endif()
+
+if(ENABLE_TESTING STREQUAL "ON")
     add_subdirectory(dependencies/external/unity)
     add_subdirectory(tests)
     enable_testing()
-else()
-    set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -03")
-    set(CMAKE_BUILD_TYPE "Release"  CACHE STRING "Build type (Debug, Release)" FORCE)
 endif()
 
 add_subdirectory(dependencies/external/glfw)

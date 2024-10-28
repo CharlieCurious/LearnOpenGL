@@ -12,31 +12,28 @@ void processInput(GLFWwindow *window);
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
-const char *vertexShaderSource ="#version 330 core\n"
-    "layout (location = 0) in vec3 aPos;\n"
-    "layout (location = 1) in vec3 aColor;\n"
-    "out vec3 ourColor;\n"
-    "void main()\n"
-    "{\n"
-    "   gl_Position = vec4(aPos, 1.0);\n"
-    "   ourColor = aColor;\n"
-    "}\n\0";
-
-const char *fragmentShaderSource = "#version 330 core\n"
-    "out vec4 FragColor;\n"
-    "in vec3 ourColor;\n"
-    "void main()\n"
-    "{\n"
-    "   FragColor = vec4(ourColor, 1.0);\n"
-    "}\n\0";
-
-
 int main(int argc, const char **argv) {
 
     if (argc < 2) {
         puts("Specify the path to the shaders folder.");
         exit(EXIT_FAILURE);
     }
+
+    char *vertexShaderPath = getShaderSourcePath(argv[1], "vertex.glsl");
+    FILE *vertexShaderSourceFile = fopen(vertexShaderPath, "r");
+    if (vertexShaderSourceFile == NULL) {
+        perror("Could not open vertex shader source.");
+        exit(EXIT_FAILURE);
+    }
+    char *fragmentShaderPath = getShaderSourcePath(argv[1], "fragment.glsl");
+    FILE *fragmentShaderSourceFile = fopen(fragmentShaderPath, "r");
+    if (fragmentShaderSourceFile == NULL) {
+        perror("Could not open fragment shader source.");
+        exit(EXIT_FAILURE);
+    }
+
+    char *vertexShaderSource = loadShaderSource(vertexShaderSourceFile);
+    char *fragmentShaderSource = loadShaderSource(fragmentShaderSourceFile);
 
     // ------ Setup GLFW and glad ---------
     initializeGLFW();
@@ -49,6 +46,8 @@ int main(int argc, const char **argv) {
 
     // ------ Setup Shaders -------------
     programId shaderProgram = createShaderProgram(vertexShaderSource, fragmentShaderSource, onCreateProgramError);
+    free(vertexShaderSource);
+    free(fragmentShaderSource);
 
     // ------ Setup vertex data and buffers and configure vertex attributes ------
     float vertices[] = {
