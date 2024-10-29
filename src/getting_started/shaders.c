@@ -15,7 +15,7 @@ const unsigned int SCR_HEIGHT = 600;
 int main(int argc, const char **argv) {
 
     if (argc < 2) {
-        puts("Specify the path to the shaders folder.");
+        fprintf(stderr, "Usage: %s <shader-folder-path>\n", argv[0]);
         exit(EXIT_FAILURE);
     }
 
@@ -33,7 +33,9 @@ int main(int argc, const char **argv) {
     }
 
     char *vertexShaderSource = loadShaderSource(vertexShaderSourceFile);
+    fclose(vertexShaderSourceFile);
     char *fragmentShaderSource = loadShaderSource(fragmentShaderSourceFile);
+    fclose(fragmentShaderSourceFile);
 
     // ------ Setup GLFW and glad ---------
     initializeGLFW();
