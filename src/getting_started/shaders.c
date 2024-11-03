@@ -20,13 +20,15 @@ int main(int argc, const char **argv) {
         exit(EXIT_FAILURE);
     }
 
-    char *vertexShaderPath = getShaderSourcePath(argv[1], "vertex.glsl");
+    char vertexShaderPath[256];
+    getSourceFilePath(vertexShaderPath, 256, argv[1], "vertex.glsl");
     FILE *vertexShaderSourceFile = fopen(vertexShaderPath, "r");
     if (vertexShaderSourceFile == NULL) {
         perror("Could not open vertex shader source.");
         exit(EXIT_FAILURE);
     }
-    char *fragmentShaderPath = getShaderSourcePath(argv[1], "fragment.glsl");
+    char fragmentShaderPath[256];
+    getSourceFilePath(fragmentShaderPath, 256, argv[1], "fragment.glsl");
     FILE *fragmentShaderSourceFile = fopen(fragmentShaderPath, "r");
     if (fragmentShaderSourceFile == NULL) {
         perror("Could not open fragment shader source.");

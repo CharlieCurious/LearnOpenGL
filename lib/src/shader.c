@@ -54,28 +54,6 @@ programId createShaderProgram(
         return program;
 }
 
-char *getShaderSourcePath(const char *shaderFolderPath, const char* shaderFileName) {
-    char shaderFolderPathBuffer[1024];
-    strncpy(shaderFolderPathBuffer, shaderFolderPath, sizeof(shaderFolderPathBuffer) - 1);
-    shaderFolderPathBuffer[sizeof(shaderFolderPathBuffer) - 1] = '\0';
-
-    // Remove leading "./" if present
-    if (strncmp(shaderFolderPathBuffer, "./", 2) == 0) {
-        memmove(shaderFolderPathBuffer, shaderFolderPathBuffer + 2, strlen(shaderFolderPathBuffer) - 1);
-    }
-
-    // Remove trailing "/" if present
-    size_t len = strlen(shaderFolderPathBuffer);
-    if (len > 0 && shaderFolderPathBuffer[len - 1] == '/') {
-        shaderFolderPathBuffer[len - 1] = '\0';
-    }
-
-    char *shaderPathBuffer = malloc(2048 * sizeof(char));
-    snprintf(shaderPathBuffer, 2048, "%s/%s", shaderFolderPathBuffer, shaderFileName);
-
-    return shaderPathBuffer;
-}
-
 void setUniformBool(programId programID, char *name, bool value) {
     glUniform1i(glGetUniformLocation(programID, name), (int)value);
 }

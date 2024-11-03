@@ -11,10 +11,8 @@ typedef unsigned int pathParsingResult;
 pathParsingResult getSourceFilePath(
     char *outputBuffer, 
     size_t bufferSize,
-    const char *folderPath,
+    char *folderPath,
     const char *fileName
     );
 
 char *loadFileContentToString(FILE *file);
-
-void sanitizePath(char *path);

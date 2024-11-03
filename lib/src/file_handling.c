@@ -4,16 +4,19 @@
 
 #define MAX_FILE_SIZE 1048576 // 1 MB
 
+static void sanitizePath(char *);
+
 pathParsingResult getSourceFilePath(
     char *outputBuffer, 
     size_t bufferSize,
-    const char *folderPath,
+    char *folderPath,
     const char *fileName
     ) {
         if (!outputBuffer || !folderPath || !fileName) {
             return PATH_PARSING_ERROR; 
         }
 
+        sanitizePath(folderPath);
         size_t folderPathLen = strlen(folderPath);
         if (folderPathLen + 1 > bufferSize) {
             return PATH_PARSING_ERROR;
@@ -62,7 +65,7 @@ char *loadFileContentToString(FILE *file) {
     return content;
 }
 
-void sanitizePath(char *path) {
+static void sanitizePath(char *path) {
     size_t len = strlen(path);
     if ((strcmp(path, "./") == 0) || (strcmp(path, "/") == 0 )) {
         path[0] = '\0';
