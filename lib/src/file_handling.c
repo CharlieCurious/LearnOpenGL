@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 
-static void sanitizePath(char *path);
+#define MAX_FILE_SIZE 1048576 // 1 MB
 
 pathParsingResult getSourceFilePath(
     char *outputBuffer, 
@@ -24,24 +24,53 @@ pathParsingResult getSourceFilePath(
         return PATH_PARSING_SUCCESS;
 }
 
+char *loadFileContentToString(FILE *file) {
+    if (!file) {
+        return NULL;
+    }
+
+    if(fseek(file, 0L, SEEK_END) != 0) {
+        perror("Failed to determine file size.");
+        return NULL;
+    }
+    
+    long length = ftell(file);
+    if (length < 0 || length > MAX_FILE_SIZE) {
+        perror("File size error of file too large.");
+        return NULL;
+    }
+
+    rewind(file);
+
+    char *content = (char *)malloc(length + 2); // +2 for /n and /0.
+    if (!content) {
+        perror("Memory allocation failed.");
+        return NULL;
+    }
+
+    size_t read_size = fread(content, 1, length, file);
+
+    // Handle incomplete reads
+    if (read_size != length) {
+        perror("Failed to read the entire file.");
+        free(content);
+        return NULL;
+    }
+
+    memcpy(content + length, "\n\0", 2);
+
+    return content;
+}
+
 void sanitizePath(char *path) {
     size_t len = strlen(path);
-
     if ((strcmp(path, "./") == 0) || (strcmp(path, "/") == 0 )) {
         path[0] = '\0';
         return;
     }
 
-    if (len > 2 && strncmp(path, "./", 2) == 0) {
-        memmove(path, path + 2, len - 1);
-    }
-    else if (len > 1 && path[0] == '/') {
-        memmove(path, path + 1, len);
-    }
-
-    len = strlen(path);
     if (len > 0 && path[len - 1] == '/') {
-        path[len - 1] == '\0';
+        path[len - 1] = '\0';
     }
 }
 

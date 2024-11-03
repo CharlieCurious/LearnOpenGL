@@ -1,5 +1,6 @@
 #include <lib.h>
 #include <shader.h>
+#include <file_handling.h>
 #include <math.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -32,9 +33,9 @@ int main(int argc, const char **argv) {
         exit(EXIT_FAILURE);
     }
 
-    char *vertexShaderSource = loadShaderSource(vertexShaderSourceFile);
+    char *vertexShaderSource = loadFileContentToString(vertexShaderSourceFile);
     fclose(vertexShaderSourceFile);
-    char *fragmentShaderSource = loadShaderSource(fragmentShaderSourceFile);
+    char *fragmentShaderSource = loadFileContentToString(fragmentShaderSourceFile);
     fclose(fragmentShaderSourceFile);
 
     // ------ Setup GLFW and glad ---------

@@ -21,7 +21,7 @@ foreach(TEST_SOURCE ${TEST_SOURCES})
     target_link_libraries(${TEST_NAME} PRIVATE ${SOURCES_TO_LINK})
 
     # Include directories so the test files can access headers
-    target_include_directories(${TEST_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/lib)
+    target_include_directories(${TEST_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/lib/include)
 
     #Register the test with CTest
     add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})

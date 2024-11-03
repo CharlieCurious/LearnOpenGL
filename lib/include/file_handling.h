@@ -5,6 +5,7 @@
 
 typedef unsigned int pathParsingResult;
 
+#include <stdio.h>
 #include <stdlib.h>
 
 pathParsingResult getSourceFilePath(
@@ -13,3 +14,7 @@ pathParsingResult getSourceFilePath(
     const char *folderPath,
     const char *fileName
     );
+
+char *loadFileContentToString(FILE *file);
+
+void sanitizePath(char *path);
