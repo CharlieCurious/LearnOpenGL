@@ -27,5 +27,6 @@ endif()
 
 add_subdirectory(dependencies/external/glfw)
 add_subdirectory(dependencies/glad)
+add_subdirectory(dependencies/stb_image)
 add_subdirectory(src)
 add_subdirectory(lib)
