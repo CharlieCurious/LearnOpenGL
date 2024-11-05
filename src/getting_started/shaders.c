@@ -7,7 +7,6 @@
 #include <string.h>
 
 void framebufferSizeCallback(GLFWwindow *window, int width, int height);
-void onCreateProgramError(ShaderProgramError, char *);
 void processInput(GLFWwindow *window);
 
 const unsigned int SCR_WIDTH = 800;
@@ -22,23 +21,9 @@ int main(int argc, char **argv) {
 
     char vertexShaderPath[256];
     getSourceFilePath(vertexShaderPath, 256, argv[1], "vertex.glsl");
-    FILE *vertexShaderSourceFile = fopen(vertexShaderPath, "r");
-    if (vertexShaderSourceFile == NULL) {
-        perror("Could not open vertex shader source.");
-        exit(EXIT_FAILURE);
-    }
+    
     char fragmentShaderPath[256];
     getSourceFilePath(fragmentShaderPath, 256, argv[1], "fragment.glsl");
-    FILE *fragmentShaderSourceFile = fopen(fragmentShaderPath, "r");
-    if (fragmentShaderSourceFile == NULL) {
-        perror("Could not open fragment shader source.");
-        exit(EXIT_FAILURE);
-    }
-
-    char *vertexShaderSource = loadFileContentToString(vertexShaderSourceFile);
-    fclose(vertexShaderSourceFile);
-    char *fragmentShaderSource = loadFileContentToString(fragmentShaderSourceFile);
-    fclose(fragmentShaderSourceFile);
 
     // ------ Setup GLFW and glad ---------
     initializeGLFW();
@@ -50,9 +35,7 @@ int main(int argc, char **argv) {
     loadOpenGLFunctionPointersOrExit();
 
     // ------ Setup Shaders -------------
-    programId shaderProgram = createShaderProgram(vertexShaderSource, fragmentShaderSource, onCreateProgramError);
-    free(vertexShaderSource);
-    free(fragmentShaderSource);
+    Shader *shader = createShader(vertexShaderPath, fragmentShaderPath);
 
     // ------ Setup vertex data and buffers and configure vertex attributes ------
     float vertices[] = {
@@ -78,7 +61,7 @@ int main(int argc, char **argv) {
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
-    glUseProgram(shaderProgram);
+    shader->use();
 
     while (!glfwWindowShouldClose(window)) {
         processInput(window);
@@ -97,7 +80,7 @@ int main(int argc, char **argv) {
 
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
-    glDeleteProgram(shaderProgram);
+    shader->delete();
 
     glfwTerminate();
     return EXIT_SUCCESS;
@@ -105,24 +88,6 @@ int main(int argc, char **argv) {
 
 void framebufferSizeCallback(GLFWwindow *window, int width, int height) {
     glViewport(0, 0, width, height);
-}
-
-void onCreateProgramError(ShaderProgramError errorType, char *message) {
-    switch (errorType)
-    {
-    case SHADER_COMPILATION:
-        fprintf(stderr, "One or more shaders failed to compile: %s\n.", message);
-        glfwTerminate();
-        exit(EXIT_FAILURE);
-    case PROGRAM_LINKING:
-        fprintf(stderr, "Shader program linking failed: %s\n.", message);
-        glfwTerminate();
-        exit(EXIT_FAILURE);
-    default:
-        fprintf(stderr, "Unexpected error while creating shader program occurred: %s\n.", message);
-        glfwTerminate();
-        exit(EXIT_FAILURE);
-    }
 }
 
 void processInput(GLFWwindow *window) {
