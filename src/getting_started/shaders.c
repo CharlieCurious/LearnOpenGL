@@ -6,9 +6,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-void framebufferSizeCallback(GLFWwindow *window, int width, int height);
-void processInput(GLFWwindow *window);
-
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
@@ -84,14 +81,4 @@ int main(int argc, char **argv) {
 
     glfwTerminate();
     return EXIT_SUCCESS;
-}
-
-void framebufferSizeCallback(GLFWwindow *window, int width, int height) {
-    glViewport(0, 0, width, height);
-}
-
-void processInput(GLFWwindow *window) {
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-        glfwSetWindowShouldClose(window, true);
-    }
 }
