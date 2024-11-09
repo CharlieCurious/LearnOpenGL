@@ -4,3 +4,6 @@
 [submodule "dependencies/external/glfw"]
 	path = dependencies/external/glfw
 	url = https://github.com/glfw/glfw.git
+[submodule "dependencies/external/cglm"]
+	path = dependencies/external/cglm
+	url = https://github.com/recp/cglm.git

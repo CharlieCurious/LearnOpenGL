@@ -26,6 +26,11 @@ if(ENABLE_TESTING STREQUAL "ON")
 endif()
 
 add_subdirectory(dependencies/external/glfw)
+
+add_subdirectory(dependencies/external/cglm)
+set(CGLM_SHARED OFF CACHE BOOL "" FORCE)  # Disable shared library
+set(CGLM_STATIC ON CACHE BOOL "" FORCE)   # Enable static library
+
 add_subdirectory(dependencies/glad)
 add_subdirectory(dependencies/stb_image)
 add_subdirectory(src)

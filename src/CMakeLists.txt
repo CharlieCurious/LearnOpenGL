@@ -1,5 +1,5 @@
 set(CHAPTER "getting_started" CACHE STRING "Chapter to compile.")
-set(LESSON "textures" CACHE STRING "Lesson to compile.")
+set(LESSON "transformations" CACHE STRING "Lesson to compile.")
 
 set(SHADERS_SRC_FOLDER "${CMAKE_SOURCE_DIR}/src/${CHAPTER}/shaders")
 set(SHADERS_BUILD_FOLDER "${CMAKE_BINARY_DIR}/src/shaders")
@@ -36,4 +36,5 @@ add_executable(main ${SOURCE_FILE})
 add_custom_target(copy_shaders ALL DEPENDS "${SHADERS_BUILD_FOLDER}")
 add_custom_target(copy_textures ALL DEPENDS "${TEXTURES_BUILD_FOLDER}")
 
-target_link_libraries(main glfw glad lib stb_image)
+target_link_libraries(main glfw glad lib stb_image cglm)
+target_include_directories(main PRIVATE ${CMAKE_SOURCE_DIR}/dependencies/external/cglm/include)
