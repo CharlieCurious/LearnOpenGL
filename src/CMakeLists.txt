@@ -1,5 +1,5 @@
 set(CHAPTER "getting_started" CACHE STRING "Chapter to compile.")
-set(LESSON "coordinate_systems" CACHE STRING "Lesson to compile.")
+set(LESSON "camara" CACHE STRING "Lesson to compile.")
 
 set(SHADERS_SRC_FOLDER "${CMAKE_SOURCE_DIR}/src/${CHAPTER}/shaders")
 set(SHADERS_BUILD_FOLDER "${CMAKE_BINARY_DIR}/src/shaders")
