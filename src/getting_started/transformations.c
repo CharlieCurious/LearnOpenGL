@@ -1,3 +1,4 @@
+#include <cglm/cglm.h>
 #include <file_handling.h>
 #include <lib.h>
 #include <shader.h>
@@ -14,10 +15,10 @@ int main(int argc, char **argv) {
     }
 
     char vertexShaderPath[256];
-    getSourceFilePath(vertexShaderPath, 256, argv[1], "4.1.texture.vs");
+    getSourceFilePath(vertexShaderPath, 256, argv[1], "5.1.transform.vs");
     
     char fragmentShaderPath[256];
-    getSourceFilePath(fragmentShaderPath, 256, argv[1], "4.1.texture.fs");
+    getSourceFilePath(fragmentShaderPath, 256, argv[1], "5.1.transform.fs");
 
     char containerTexturePath[256];
     getSourceFilePath(containerTexturePath, 256, argv[2], "container.jpg");
@@ -28,22 +29,24 @@ int main(int argc, char **argv) {
     initializeGLFW();
     GLFWwindow *window = createGLFWwindowOrExit(SCR_WIDTH, SCR_HEIGHT);
     glfwMakeContextCurrent(window);
-
     loadOpenGLFunctionPointersOrExit();
 
     Shader *shader = createShader(vertexShaderPath, fragmentShaderPath);
 
+
+    // set up vertex data (and buffer(s)) and configure vertex attributes
+    // ------------------------------------------------------------------
     float vertices[] = {
-        0.5f, 0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f, //  top right
-        0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,   1.0f, 0.0f, // bottom right
-        -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f,   0.0f, 0.0f, // bottom left
-        -0.5f, 0.5f, 0.0f,  1.0f, 1.0f, 0.0f,   0.0f, 1.0f  // top left
+        // positions          // texture coords
+         0.5f,  0.5f, 0.0f,   1.0f, 1.0f, // top right
+         0.5f, -0.5f, 0.0f,   1.0f, 0.0f, // bottom right
+        -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, // bottom left
+        -0.5f,  0.5f, 0.0f,   0.0f, 1.0f  // top left 
     };
     unsigned int indices[] = {
-        0, 1, 3,    // first triangle
-        1, 2, 3     // second triangle
+        0, 1, 3, // first triangle
+        1, 2, 3  // second triangle
     };
-
     unsigned int VBO, VAO, EBO;
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
@@ -58,14 +61,11 @@ int main(int argc, char **argv) {
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     // position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
-    // color attribute
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(3 * sizeof(float)));
+    // texture coord attribute
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
-    // texture coord attribtue
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(6 * sizeof(float)));
-    glEnableVertexAttribArray(2);
 
     // load and create a texture
     // -------------------------
@@ -113,6 +113,7 @@ int main(int argc, char **argv) {
     stbi_image_free(data);
 
     shader->use();
+    shader->setUniformInt("texture1", 0);
     shader->setUniformInt("texture2", 1);
 
     while (!glfwWindowShouldClose(window)) {
@@ -127,7 +128,24 @@ int main(int argc, char **argv) {
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, texture2);
 
+        // initialize and indentity matrix
+        mat4 transform;
+        glm_mat4_identity(transform);
+        
+        // apply translation
+        vec3 translation = { 0.5f, -0.5, 0.0f };
+        glm_translate(transform, translation);
+
+        // apply rotation
+        float angle = (float)glfwGetTime();
+        glm_rotate_z(transform, angle, transform);
+
+        // get matrix's uniform location and set matrix
         shader->use();
+        unsigned int transformLoc = glGetUniformLocation(shader->id, "transform");
+        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, (float *)transform);
+
+
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
