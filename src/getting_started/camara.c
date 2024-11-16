@@ -3,11 +3,24 @@
 #include <cglm/cglm.h>
 #include <lib.h>
 #include <stb_image.h>
+#include <stdbool.h>
 
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
+float deltaTime = 0.0f;
+float lastFrame = 0.0f;
+
+float yaw = -90.0f;
+float pitch = 0.0f;
+float lastX = 400;
+float lastY = 300;
+float fov = 45.0f;
+bool isFirstMouse = true;
+
 void processCamaraInput(GLFWwindow *window);
+void mouseCallback(GLFWwindow *window, double xpos, double ypos);
+void scrollCallback(GLFWwindow *window, double xoffset, double yoffset);
 
 // Camara
 vec3 camaraPos = (vec3){0.0f, 0.0f, 3.0f};
@@ -165,11 +178,16 @@ int main(int argc, char **argv) {
 
     mat4 projection;
     glm_mat4_identity(projection);
-    glm_perspective(glm_rad(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f, projection);
     unsigned int projectionLoc = glGetUniformLocation(shader->id, "projection");
-    glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, (float *)projection);
+
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetCursorPosCallback(window, mouseCallback);
+    glfwSetScrollCallback(window, scrollCallback);
 
     while (!glfwWindowShouldClose(window)) {
+        float currentFrame = glfwGetTime();
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
         processCamaraInput(window);
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -195,6 +213,8 @@ int main(int argc, char **argv) {
         glm_vec3_add(camaraPos, camaraFront, center);
         glm_lookat(camaraPos, center, camaraUp, view);
         glUniformMatrix4fv(viewLoc, 1, GL_FALSE, (float *)view);
+        glm_perspective(glm_rad(fov), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f, projection);
+        glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, (float *)projection);
 
         // render container
         glBindVertexArray(VAO);
@@ -230,7 +250,7 @@ void processCamaraInput(GLFWwindow *window) {
         glfwSetWindowShouldClose(window, true);
     }
 
-    const float camaraSpeed = 0.05f;
+    const float camaraSpeed = 2.5f * deltaTime;
     vec3 newPos;
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
         glm_vec3_scale(camaraFront, camaraSpeed, newPos);
@@ -250,4 +270,44 @@ void processCamaraInput(GLFWwindow *window) {
         glm_vec3_scale(newPos, camaraSpeed, newPos);
         glm_vec3_add(camaraPos, newPos, camaraPos);
     }
+}
+
+void mouseCallback(GLFWwindow *window, double xpos, double ypos) {
+    if (isFirstMouse) {
+        lastX = xpos;
+        lastY = ypos;
+        isFirstMouse = false;
+    }
+    float xoffset = xpos - lastX;
+    float yoffset = lastY - ypos;
+    lastX = xpos;
+    lastY = ypos;
+
+    const float sensitivity = 0.1f;
+    xoffset *= sensitivity;
+    yoffset *= sensitivity;
+
+    yaw += xoffset;
+    pitch += yoffset;
+
+    if (pitch > 89.0f)
+        pitch = 89.0f;
+    if (pitch < -89.0f)
+        pitch = -89.0f;
+
+    vec3 direction;
+    direction[0] = cosf(glm_rad(yaw)) * cosf(glm_rad(pitch));   // x component
+    direction[1] = sinf(glm_rad(pitch));    // y component
+    direction[2] = sinf(glm_rad(yaw)) * cosf(glm_rad(pitch));   // z component
+
+    glm_vec3_normalize_to(direction, camaraFront);
+}
+
+
+void scrollCallback(GLFWwindow *window, double xoffset, double yoffset) {
+    fov -= (float)yoffset;
+    if (fov < 1.0f)
+        fov = 1.0f;
+    if (fov > 45.0f)
+        fov = 45.0f;
 }
