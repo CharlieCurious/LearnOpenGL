@@ -49,7 +49,7 @@ int main(int argc, char **argv) {
 
     // glad: load all OpenGL function pointers
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-        perror('Failed to initialize GLAD.');
+        perror("Failed to initialize GLAD.");
         return EXIT_FAILURE;
     }
 
