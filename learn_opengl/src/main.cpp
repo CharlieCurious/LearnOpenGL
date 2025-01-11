@@ -175,7 +175,7 @@ int main() {
 
     // --------------------------------------------------------------------------------------------------------//
 
-    Shader lightingShader("shaders/2.2.basic_lighting.vert", "shaders/2.2.basic_lighting.frag");
+    Shader lightingShader("shaders/2.2.basic_lighting.vert", "shaders/3.1.materials.frag");
     Shader lightCubeShader("shaders/1.light_cube.vert", "shaders/1.light_cube.frag");
 
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -191,14 +191,18 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         lightingShader.use();
-        lightingShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
-        lightingShader.setVec3("lightColor",  1.0f, 1.0f, 1.0f);
-
-        lightPos.x = 1.0f + sin(glfwGetTime()) * 2.0f;
-        lightPos.y = sin(glfwGetTime() / 2.0f) * 1.0f;
         lightingShader.setVec3("lightPos", lightPos);
-
         lightingShader.setVec3("viewPos", camara.m_Position);
+
+        lightingShader.setVec3("light.ambient",  0.2f, 0.2f, 0.2f);
+        lightingShader.setVec3("light.diffuse",  0.5f, 0.5f, 0.5f); // darken diffuse light a bit
+        lightingShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+
+        lightingShader.setVec3("material.ambient", 1.0f, 0.5f, 0.31f);
+        lightingShader.setVec3("material.diffuse", 1.0f, 0.5f, 0.31f);
+        lightingShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
+        lightingShader.setFloat("material.shininess", 32.0f);
+
 
         glm::mat4 projection = glm::perspective(glm::radians(camara.m_Zoom), (float)SRC_WIDTH/(float)SRC_HEIGHT, 0.1f, 100.0f);
         glm::mat4 view = camara.GetViewMatrix();
