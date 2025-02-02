@@ -1,4 +1,3 @@
-#include <cstdint>
 #include <glad/glad.h>
 #include <stb_image/stb_image.h>
 

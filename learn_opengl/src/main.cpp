@@ -75,41 +75,6 @@ void processInput(GLFWwindow *window) {
     }
 }
 
-uint loadTexture(const char *path) {
-    uint textureID;
-    glGenTextures(1, &textureID);
-
-    int width, height, nrComponents;
-    uint8_t *data = stbi_load(path, &width, &height, &nrComponents, 0);
-    if (data) {
-        GLenum format;
-        if (nrComponents == 1) {
-            format = GL_RED;
-        }
-        else if (nrComponents == 3) {
-            format = GL_RGB;
-        } else {
-            format = GL_RGBA;
-        }
-
-        glBindTexture(GL_TEXTURE_2D, textureID);
-        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-        stbi_image_free(data);
-    } else {
-        std::cout << "Texture failed to load at path: " << path << std::endl;
-        stbi_image_free(data);
-    }
-
-    return textureID;
-}
-
 int main() {
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -140,7 +105,7 @@ int main() {
 
     glEnable(GL_DEPTH_TEST);
 
-    Shader ourShader("shaders/model_loading/1.model_loading.vert", "shaders/model_loading/1.model_loading.frag");
+    Shader ourShader("shaders/model_loading/2.model_loading.vert", "shaders/model_loading/2.model_loading.frag");
     char path[] = "textures/backpack.obj";
     Model ourModel(path);
 
@@ -153,6 +118,21 @@ int main() {
 
         glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        ourShader.use();
+        ourShader.setVec3("light.position", lightPos);
+        ourShader.setVec3("viewPos", camara.m_Position);
+
+        // light properties
+        ourShader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
+        ourShader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f);
+        ourShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+        ourShader.setFloat("light.constant", 1.0f);
+        ourShader.setFloat("light.linear", 0.09f);
+        ourShader.setFloat("light.quadratic", 0.032f);
+
+        // material properties
+        ourShader.setFloat("material.shininess", 32.0f);
 
         ourShader.use();
 
